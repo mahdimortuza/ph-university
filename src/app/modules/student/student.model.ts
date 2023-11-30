@@ -1,6 +1,4 @@
-import bcrypt from 'bcrypt';
 import { Schema, model } from 'mongoose';
-import config from '../../config';
 import {
   StudentModel,
   TGuardian,
@@ -32,10 +30,6 @@ const UserNameSchema = new Schema<TUserName>({
     type: String,
     trim: true,
     maxlength: [20, 'last name must be 20 characters'],
-    // validate: {
-    //     validator: (value: string) => validator.isAlpha(value),
-    //     message: '{VALUE} is not valid',
-    //   },
   },
 });
 
@@ -92,11 +86,13 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       required: [true, 'student id is required'],
       unique: true,
     },
-    password: {
-      type: String,
-      required: true,
-      maxlength: [20, 'password can not be more than 20 characters.'],
+    user: {
+      type: Schema.Types.ObjectId,
+      required: [true, 'User id is required'],
+      unique: true,
+      ref: 'User',
     },
+
     name: {
       type: UserNameSchema,
       required: [true, 'student name is required.'],
@@ -149,11 +145,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
     profileImg: {
       type: String,
     },
-    isActive: {
-      type: String,
-      enum: ['active', 'blocked'],
-      default: 'active',
-    },
+
     isDeleted: {
       type: Boolean,
       default: false,
@@ -169,22 +161,6 @@ const studentSchema = new Schema<TStudent, StudentModel>(
 // virtual
 studentSchema.virtual('fullName').get(function () {
   return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
-});
-
-// middleware
-
-studentSchema.pre('save', async function (next) {
-  const user = this;
-  user.password = await bcrypt.hash(
-    user.password,
-    Number(config.bcrypt_salt_round),
-  );
-  next();
-});
-
-studentSchema.post('save', async function (doc, next) {
-  doc.password = '';
-  next();
 });
 
 // query middleware
@@ -209,16 +185,5 @@ studentSchema.statics.isUserExists = async function (id: string) {
   const existingUser = await Student.findOne({ id });
   return existingUser;
 };
-
-// const schema = new Schema<IUser, UserModel>({ name: String });
-// schema.static('myStaticMethod', function myStaticMethod() {
-//   return 42;
-// });
-
-// creating a custom instance method
-// studentSchema.methods.isUserExist = async function (id: string) {
-//   const existingUser = await Student.findOne({ id });
-//   return existingUser;
-// };
 
 export const Student = model<TStudent, StudentModel>('Student', studentSchema);
