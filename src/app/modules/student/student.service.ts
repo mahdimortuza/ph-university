@@ -1,5 +1,5 @@
-import { Student } from '../student.model';
 import { TStudent } from './student.interface';
+import { Student } from './student.model';
 
 const createStudentIntoDb = async (studentData: TStudent) => {
   if (await Student.isUserExists(studentData.id)) {
