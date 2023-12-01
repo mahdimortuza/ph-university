@@ -38,8 +38,6 @@ const userSchema = new Schema<TUser>(
   },
 );
 
-// middleware
-
 userSchema.pre('save', async function (next) {
   const user = this;
   user.password = await bcrypt.hash(
@@ -49,7 +47,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
-userSchema.post('save', async function (doc, next) {
+userSchema.post('save', function (doc, next) {
   doc.password = '';
   next();
 });

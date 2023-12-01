@@ -3,8 +3,10 @@ import express, { Application, Request, Response } from 'express';
 import globalErrorHandler from './app/middlewares/globalErrorHandler';
 import notFound from './app/middlewares/notFound';
 import router from './app/routs';
+
 const app: Application = express();
 
+//parsers
 app.use(express.json());
 app.use(cors());
 
@@ -12,12 +14,15 @@ app.use(cors());
 app.use('/api/v1', router);
 
 const test = (req: Request, res: Response) => {
-  res.send('Hello Worlds!');
+  const a = 10;
+  res.send(a);
 };
 
 app.get('/', test);
 
 app.use(globalErrorHandler);
+
+//Not Found
 app.use(notFound);
 
 export default app;

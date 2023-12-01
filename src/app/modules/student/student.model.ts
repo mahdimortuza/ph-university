@@ -7,20 +7,12 @@ import {
   TUserName,
 } from './student.interface';
 
-const UserNameSchema = new Schema<TUserName>({
+const userNameSchema = new Schema<TUserName>({
   firstName: {
     type: String,
-    required: [true, 'first name is required'],
+    required: [true, 'First Name is required'],
     trim: true,
-    maxlength: [20, 'name can not be 20 characters'],
-    validate: {
-      validator: function (value: string) {
-        const firstNameStr =
-          value.charAt(0).toLocaleUpperCase() + value.slice(1);
-        return firstNameStr === value;
-      },
-      message: '{VALUE} is not capitalized format',
-    },
+    maxlength: [20, 'Name can not be more than 20 characters'],
   },
   middleName: {
     type: String,
@@ -29,53 +21,56 @@ const UserNameSchema = new Schema<TUserName>({
   lastName: {
     type: String,
     trim: true,
-    maxlength: [20, 'last name must be 20 characters'],
+    required: [true, 'Last Name is required'],
+    maxlength: [20, 'Name can not be more than 20 characters'],
   },
 });
 
 const guardianSchema = new Schema<TGuardian>({
   fatherName: {
     type: String,
-    required: [true, "Father's name is required."],
+    trim: true,
+    required: [true, 'Father Name is required'],
   },
   fatherOccupation: {
     type: String,
-    required: [true, 'father occupation is required'],
+    trim: true,
+    required: [true, 'Father occupation is required'],
   },
   fatherContactNo: {
     type: String,
-    required: [true, 'father contact is required'],
+    required: [true, 'Father Contact No is required'],
   },
   motherName: {
     type: String,
-    required: [true, 'mother name is required'],
+    required: [true, 'Mother Name is required'],
   },
   motherOccupation: {
     type: String,
-    required: [true, 'mother occupation is required'],
+    required: [true, 'Mother occupation is required'],
   },
   motherContactNo: {
     type: String,
-    required: [true, 'mother contact is required'],
+    required: [true, 'Mother Contact No is required'],
   },
 });
 
-const localGuardianSchema = new Schema<TLocalGuardian>({
+const localGuradianSchema = new Schema<TLocalGuardian>({
   name: {
     type: String,
-    required: [true, 'local guardian name is required'],
+    required: [true, 'Name is required'],
   },
   occupation: {
     type: String,
-    required: [true, ' occupation is required'],
+    required: [true, 'Occupation is required'],
   },
   contactNo: {
     type: String,
-    required: [true, 'contact no is required'],
+    required: [true, 'Contact number is required'],
   },
   address: {
     type: String,
-    required: [true, 'address is required'],
+    required: [true, 'Address is required'],
   },
 });
 
@@ -83,7 +78,7 @@ const studentSchema = new Schema<TStudent, StudentModel>(
   {
     id: {
       type: String,
-      required: [true, 'student id is required'],
+      required: [true, 'ID is required'],
       unique: true,
     },
     user: {
@@ -92,60 +87,53 @@ const studentSchema = new Schema<TStudent, StudentModel>(
       unique: true,
       ref: 'User',
     },
-
     name: {
-      type: UserNameSchema,
-      required: [true, 'student name is required.'],
+      type: userNameSchema,
+      required: [true, 'Name is required'],
     },
     gender: {
       type: String,
       enum: {
-        values: ['male', 'female', 'others'],
-        message: '{VALUE} is not valid',
+        values: ['male', 'female', 'other'],
+        message: '{VALUE} is not a valid gender',
       },
-      required: [true, 'gender is required'],
+      required: [true, 'Gender is required'],
     },
-    dateOfBirth: {
-      type: String,
-      required: true,
-    },
+    dateOfBirth: { type: Date },
     email: {
       type: String,
-      required: [true, 'email is required'],
+      required: [true, 'Email is required'],
       unique: true,
     },
-    contactNo: {
-      type: String,
-      required: [true, 'contact number is required'],
-    },
+    contactNo: { type: String, required: [true, 'Contact number is required'] },
     emergencyContactNo: {
       type: String,
-      required: [true, 'contact number is required'],
+      required: [true, 'Emergency contact number is required'],
     },
-    bloodGroup: {
+    bloogGroup: {
       type: String,
-      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+      enum: {
+        values: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+        message: '{VALUE} is not a valid blood group',
+      },
     },
     presentAddress: {
       type: String,
-      required: [true, 'present address is required'],
+      required: [true, 'Present address is required'],
     },
     permanentAddress: {
       type: String,
-      required: [true, 'permanent address is required'],
+      required: [true, 'Permanent address is required'],
     },
     guardian: {
       type: guardianSchema,
-      required: [true, 'Guardian information is required.'],
+      required: [true, 'Guardian information is required'],
     },
     localGuardian: {
-      type: localGuardianSchema,
-      required: [true, 'Local guardian information is required.'],
+      type: localGuradianSchema,
+      required: [true, 'Local guardian information is required'],
     },
-    profileImg: {
-      type: String,
-    },
-
+    profileImg: { type: String },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -160,11 +148,10 @@ const studentSchema = new Schema<TStudent, StudentModel>(
 
 // virtual
 studentSchema.virtual('fullName').get(function () {
-  return `${this.name.firstName} ${this.name.middleName} ${this.name.lastName}`;
+  return this.name.firstName + this.name.middleName + this.name.lastName;
 });
 
-// query middleware
-
+// Query Middleware
 studentSchema.pre('find', function (next) {
   this.find({ isDeleted: { $ne: true } });
   next();
@@ -180,7 +167,7 @@ studentSchema.pre('aggregate', function (next) {
   next();
 });
 
-// creating a custom static method
+//creating a custom static method
 studentSchema.statics.isUserExists = async function (id: string) {
   const existingUser = await Student.findOne({ id });
   return existingUser;
