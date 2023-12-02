@@ -6,15 +6,16 @@ import { UserServices } from './user.service';
 const createStudent = catchAsync(async (req, res) => {
   const { password, student: studentData } = req.body;
 
-  const result = await UserServices.createStudentIntoDb(password, studentData);
+  const result = await UserServices.createStudentIntoDB(password, studentData);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'student is created successfully',
+    message: 'Student is created succesfully',
     data: result,
   });
 });
-export const UserController = {
+
+export const UserControllers = {
   createStudent,
 };

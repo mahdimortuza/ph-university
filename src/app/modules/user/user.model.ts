@@ -1,27 +1,25 @@
 import bcrypt from 'bcrypt';
-
 import { Schema, model } from 'mongoose';
 import config from '../../config';
 import { TUser } from './user.interface';
-
 const userSchema = new Schema<TUser>(
   {
     id: {
       type: String,
       required: true,
+      unique: true,
     },
     password: {
       type: String,
       required: true,
     },
-    needPasswordChange: {
+    needsPasswordChange: {
       type: Boolean,
       default: true,
     },
     role: {
       type: String,
-      enum: ['admin', 'student', 'faculty'],
-      required: true,
+      enum: ['student', 'faculty', 'admin'],
     },
     status: {
       type: String,
@@ -39,7 +37,9 @@ const userSchema = new Schema<TUser>(
 );
 
 userSchema.pre('save', async function (next) {
-  const user = this;
+  // eslint-disable-next-line @typescript-eslint/no-this-alias
+  const user = this; // doc
+  // hashing password and save into DB
   user.password = await bcrypt.hash(
     user.password,
     Number(config.bcrypt_salt_round),
@@ -47,6 +47,7 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+// set '' after saving password
 userSchema.post('save', function (doc, next) {
   doc.password = '';
   next();
