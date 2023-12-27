@@ -144,6 +144,22 @@ const refreshToken = async (token: string) => {
   ) {
     throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized!');
   }
+
+  //create token and sent to the  client
+
+  const jwtPayload = {
+    userId: user.id,
+    role: user.role,
+  };
+
+  const accessToken = createToken(
+    jwtPayload,
+    config.jwt_access_secret as string,
+    config.jwt_access_expires_in as string,
+  );
+  return {
+    accessToken,
+  };
 };
 
 export const AuthServices = {
