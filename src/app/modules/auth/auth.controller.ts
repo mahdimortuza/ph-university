@@ -4,7 +4,7 @@ import sendResponse from '../../utils/sendResponse';
 import { AuthServices } from './auth.service';
 
 const loginUser = catchAsync(async (req, res) => {
-  const result = AuthServices.loginUser(req.body);
+  const result = await AuthServices.loginUser(req.body);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,

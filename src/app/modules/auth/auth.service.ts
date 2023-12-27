@@ -17,24 +17,22 @@ const loginUser = async (payload: TLoginUser) => {
   // checking if the user is already deleted
   const isDeleted = user?.isDeleted;
 
-  console.log(isDeleted);
-  if (isDeleted === true) {
-    throw new AppError(httpStatus.FORBIDDEN, 'this user is already deleted!');
+  if (isDeleted) {
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is deleted !');
   }
 
   // checking if the user is already blocked
   const userStatus = user?.status;
 
   if (userStatus === 'blocked') {
-    throw new AppError(httpStatus.FORBIDDEN, 'this user is blocked!');
+    throw new AppError(httpStatus.FORBIDDEN, 'This user is blocked ! !');
   }
 
   // checking if the password is correct
   if (!(await User.isPasswordMatched(payload?.password, user?.password)))
-    // Access granted: send AccessToken, RefreshToken
-    throw new AppError(httpStatus.FORBIDDEN, 'password did not matched');
+    throw new AppError(httpStatus.FORBIDDEN, 'Password do not matched');
 
-  // create token and send to the client
+  //create token and sent to the  client
 
   const jwtPayload = {
     userId: user.id,
@@ -45,6 +43,11 @@ const loginUser = async (payload: TLoginUser) => {
     expiresIn: '10d',
   });
 
+  // const accessToken = createToken(
+  //   jwtPayload,
+  //   config.jwt_access_secret as string,
+  //   config.jwt_access_expires_in as string,
+  // );
   return {
     accessToken,
     needsPasswordChange: user?.needsPasswordChange,
