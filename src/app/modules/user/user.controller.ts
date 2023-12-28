@@ -54,7 +54,7 @@ const getMe = catchAsync(async (req, res) => {
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
-    message: 'Admin is created successfully',
+    message: 'Student is retrieved by jwt successfully',
     data: result,
   });
 });
