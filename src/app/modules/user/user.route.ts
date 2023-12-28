@@ -33,8 +33,7 @@ router.post(
 router.get(
   '/me',
   auth(USER_ROLE.admin, USER_ROLE.student, USER_ROLE.faculty),
-  validateRequest(createAdminValidationSchema),
-  UserControllers.createAdmin,
+  UserControllers.getMe,
 );
 
 export const UserRoutes = router;
