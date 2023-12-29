@@ -53,6 +53,16 @@ const createEnrolledCourseIntoDB = async (
     student: student._id,
     faculty: isOfferedCourseExists.faculty,
   });
+
+  if (!result) {
+    throw new AppError(httpStatus.CONFLICT, 'failed to enroll in this course.');
+  }
+
+  const maxCapacity = isOfferedCourseExists.maxCapacity;
+  await OfferedCourse.findByIdAndUpdate(offeredCourse, {
+    maxCapacity: maxCapacity - 1,
+  });
+
   return result;
 };
 
