@@ -1,4 +1,4 @@
-import { Schema } from 'mongoose';
+import mongoose, { Schema } from 'mongoose';
 import { Grade } from './enrolledCourse.constant';
 import { TCourseMarks, TEnrolledCourse } from './enrolledCourse.interface';
 
@@ -85,3 +85,9 @@ const enrolledCourseSchema = new Schema<TEnrolledCourse>({
     default: false,
   },
 });
+
+const EnrolledCourse = mongoose.model<TEnrolledCourse>(
+  'EnrolledCourse',
+  enrolledCourseSchema,
+);
+export default EnrolledCourse;
